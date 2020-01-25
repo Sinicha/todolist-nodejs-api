@@ -1,0 +1,26 @@
+{
+  "name": "another-todolist-api",
+  "version": "1.0.0",
+  "description": "This is a test project todolist api.",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sinicha/todolist-nodejs-api.git"
+  },
+  "author": "Sinicha RADOSAVLJEVIC",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sinicha/todolist-nodejs-api/issues"
+  },
+  "homepage": "https://github.com/Sinicha/todolist-nodejs-api#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  }
+}

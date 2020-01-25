@@ -1,0 +1,13 @@
+version: '3'
+services:
+    api:
+        image: node:13-alpine
+        container_name: todolist-nodejs-api
+        volumes: 
+            - ./src:/usr/src/service
+        working_dir: /usr/src/service
+        command: npm run dev
+        ports: 
+            - 8000:8000
+        environment: 
+            PORT: 8000
