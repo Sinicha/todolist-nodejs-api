@@ -2,6 +2,8 @@
  * Configuration for JWT
  */
 'use strict';
+
+
 module.exports = {
     ALGORITHM: 'HS512',
     EXPIRES_IN: 3600, // 1 hour

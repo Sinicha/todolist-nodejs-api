@@ -4,6 +4,7 @@
   "description": "This is a project todolist api.",
   "main": "server.js",
   "scripts": {
+    "test:unit": "mocha ./tests/unit --recursive",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
@@ -18,6 +19,7 @@
   },
   "homepage": "https://github.com/Sinicha/todolist-nodejs-api#readme",
   "dependencies": {
+    "@elastic/elasticsearch": "^7.5.0",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
@@ -25,6 +27,8 @@
     "koa-router": "^8.0.6"
   },
   "devDependencies": {
+    "mocha": "^7.0.1",
+    "chai": "^4.2.0",
     "nodemon": "^2.0.2"
   }
 }
