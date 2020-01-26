@@ -1,8 +1,26 @@
-const express = require('express');
+/**
+ * This project is an To-do list API with jwt authentication.
+ *
+ * @author Sinicha Radosavljevic
+ * @link https://github.com/Sinicha/todolist-nodejs-api
+ */
+'use strict';
+const Koa = require('koa');
+const bodyParser = require('koa-bodyparser');
 
-const app = express();
-const port = process.env.PORT || exit(1);
+// Configurations
+const port = process.env.PORT || 8000;
+const app = new Koa();
+app.use(bodyParser({
+    enableTypes: ['json'],
+    detectJSON: function (ctx) {
+        return /\.json$/i.test(ctx.path);
+    }
+}));
 
-app.listen(port, function () {
-    console.log(`Listening on ${port}!`);
-});
+// Register routes
+const authRoutes = require('./api/routes/authRoute');
+authRoutes(app);
+
+// Run the Koa server
+app.listen(port);

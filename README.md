@@ -3,6 +3,7 @@
 Why ? This is just a personnal project to try Node.js with Elasticsearch database.
 This is the api part.
 
+The project is an todo list api with authentication.
 
 # Pre-request
 
