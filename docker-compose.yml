@@ -1,4 +1,5 @@
 version: "3"
+
 services:
     api:
         image: node:13-alpine
@@ -11,6 +12,8 @@ services:
             - 8000:8000
         environment:
             PORT: 8000
+        networks:
+            - elastic
 
     es:
         image: elasticsearch:7.5.2
@@ -29,3 +32,9 @@ services:
             - ./data/es:/usr/share/elasticsearch/data
         ports:
             - "9200:9200"
+        networks:
+            - elastic
+
+networks:
+    elastic:
+        driver: bridge
