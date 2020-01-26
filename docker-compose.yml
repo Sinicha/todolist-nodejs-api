@@ -1,13 +1,31 @@
-version: '3'
+version: "3"
 services:
     api:
         image: node:13-alpine
-        container_name: todolist-nodejs-api
-        volumes: 
+        container_name: todolist-api-nodejs
+        volumes:
             - ./src:/usr/src/service
         working_dir: /usr/src/service
         command: npm run dev
-        ports: 
+        ports:
             - 8000:8000
-        environment: 
+        environment:
             PORT: 8000
+
+    es:
+        image: elasticsearch:7.5.2
+        container_name: todolist-api-es
+        environment:
+            - node.name=es01
+            - cluster.name=es-docker-cluster
+            - cluster.initial_master_nodes=es01
+            - bootstrap.memory_lock=true
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - ./data/es:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"
