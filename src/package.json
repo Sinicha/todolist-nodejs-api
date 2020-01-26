@@ -4,6 +4,7 @@
   "description": "This is a project todolist api.",
   "main": "server.js",
   "scripts": {
+    "test:unit": "mocha ./tests/unit --recursive",
     "dev": "nodemon server.js",
     "start": "node server.js"
   },
@@ -26,6 +27,8 @@
     "koa-router": "^8.0.6"
   },
   "devDependencies": {
+    "mocha": "^7.0.1",
+    "chai": "^4.2.0",
     "nodemon": "^2.0.2"
   }
 }
