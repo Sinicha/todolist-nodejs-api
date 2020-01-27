@@ -25,4 +25,5 @@ authRoutes(app);
 registerRoutes(app);
 
 // Run the Koa server
-app.listen(port);
+let server = app.listen(port);
+module.exports = server

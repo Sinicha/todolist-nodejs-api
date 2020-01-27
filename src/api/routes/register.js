@@ -33,9 +33,9 @@ module.exports = function (app) {
         // Todo: Save the user
 
         // Return the status
-        ctx.status = 201;
+        ctx.status = 200;
         ctx.body = {
-            message: 'Account created'
+            message: 'OK'
         };
     });
 
