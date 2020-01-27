@@ -7,7 +7,7 @@
     "test:unit": "mocha ./tests/unit --recursive",
     "test:func": "mocha ./tests/functional --recursive",
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "prod": "node server.js"
   },
   "repository": {
     "type": "git",

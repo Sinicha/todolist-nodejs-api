@@ -7,11 +7,6 @@ services:
         volumes:
             - ./src:/usr/src/service
         working_dir: /usr/src/service
-        command: npm run dev
-        ports:
-            - 8000:8000
-        environment:
-            PORT: 8000
         networks:
             - elastic
 
@@ -28,10 +23,6 @@ services:
             memlock:
                 soft: -1
                 hard: -1
-        volumes:
-            - ./data/es:/usr/share/elasticsearch/data
-        ports:
-            - "9200:9200"
         networks:
             - elastic
 

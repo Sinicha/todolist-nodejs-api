@@ -105,3 +105,6 @@ dist
 
 # Data shared by docker services
 data/
+
+# Report of tests
+reports/
