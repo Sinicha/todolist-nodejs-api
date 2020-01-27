@@ -16,5 +16,5 @@ Or, you can also adapt the configuration to run it directly with your own Node.j
 
 # Lunch the project
 
-To build the docker stack, use this command :
-`docker-compose up -d --build`
+To build the docker stack for dev, use this command :
+`docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build`

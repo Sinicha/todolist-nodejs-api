@@ -5,8 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test:unit": "mocha ./tests/unit --recursive",
+    "test:func": "mocha ./tests/functional --recursive",
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "prod": "node server.js"
   },
   "repository": {
     "type": "git",
@@ -24,7 +25,9 @@
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.2.1",
     "koa-jwt": "^3.6.0",
-    "koa-router": "^8.0.6"
+    "koa-router": "^8.0.6",
+    "node-input-validator": "^4.1.0",
+    "supertest": "^4.0.2"
   },
   "devDependencies": {
     "mocha": "^7.0.1",

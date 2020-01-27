@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+    api:
+        command: npm run dev
+        ports:
+            - 8000:8000
+        environment:
+            PORT: 8000
+
+    es:
+        volumes:
+            - ./data/es:/usr/share/elasticsearch/data
+        ports:
+            - "9200:9200"

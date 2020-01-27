@@ -3,7 +3,7 @@ const { Client } = require('@elastic/elasticsearch')
 const configDb = require('../configuration/database');
 
 // The manager is global in this file
-let client;
+let gClient;
 
 
 /**
@@ -18,12 +18,12 @@ module.exports = class EsManager {
      * Initialize once the elasticsearch connection
      */
     init() {
-        if (typeof client === 'undefined') {
-            client = new Client({ 
+        if (typeof gClient === 'undefined') {
+            gClient = new Client({ 
                 node: configDb.protocol + '://' + configDb.host + ':' + configDb.port.toString()
             });
         }
-        this.client = client;
+        this.client = gClient;
     }
 
     getClient() {
