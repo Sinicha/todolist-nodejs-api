@@ -6,6 +6,6 @@
 
 module.exports = {
     protocol: 'http',
-    host: 'es',
-    port: 9200
+    host: process.env.ES_HOST || 'localhost',
+    port: process.env.ES_PORT || 9200
 }

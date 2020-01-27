@@ -7,6 +7,9 @@ services:
         volumes:
             - ./src:/usr/src/service
         working_dir: /usr/src/service
+        environment:
+            ES_HOST: es
+            ES_PORT: 9200
         networks:
             - elastic
 

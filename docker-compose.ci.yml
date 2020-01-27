@@ -2,7 +2,10 @@ version: "3"
 
 services:
     api:
-        command: npm run test:func
+        command: >
+            sh -c "sleep 10 &&
+                    mkdir -p reports &&
+                    npm run test:func > ./reports/report.txt"
         ports:
             - 80:80
         environment:
