@@ -15,7 +15,5 @@ module.exports = function (app) {
     authenticate(ctx);
   });
 
-
-  //app.use(router.allowedMethods());
   app.use(router.routes());
 };

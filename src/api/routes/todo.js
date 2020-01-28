@@ -16,7 +16,7 @@ module.exports = function (app) {
    */
   router.get('/', jwt, (ctx, next) => {
     // Get all todo elements links to the user
- 
+
     // Return the list of all
     ctx.status = ctx.status = 400;
     return ctx.body = {
@@ -67,6 +67,5 @@ module.exports = function (app) {
     };
   });
 
-  //app.use(router.allowedMethods());
   app.use(router.routes());
 };
