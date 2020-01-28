@@ -21,8 +21,10 @@ app.use(bodyParser({
 // Register routes
 const authRoutes = require('./api/routes/authRoute');
 const registerRoutes = require('./api/routes/register');
+const todoRoutes = require('./api/routes/todo');
 authRoutes(app);
 registerRoutes(app);
+todoRoutes(app);
 
 // Run the Koa server
 let server = app.listen(port);
