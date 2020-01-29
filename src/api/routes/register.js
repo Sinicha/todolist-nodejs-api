@@ -26,7 +26,7 @@ module.exports = function (app) {
 
         // Check in database if user exist
         let usersRepository = new UsersRepository();
-        const exist = await usersRepository.existByEmail(email);
+        const exist = await usersRepository.existByEmail(email.trim().toLowerCase());
         if (exist) {
             ctx.status = 409;
             return ctx.body = {
@@ -35,7 +35,7 @@ module.exports = function (app) {
         }
 
         // Save the user
-        const saveResponse = await usersRepository.save(username, email, password);
+        const saveResponse = await usersRepository.save(username, email.trim().toLowerCase(), password);
         if (saveResponse.statusCode != 201) {
             ctx.status = 500;
             console.error("An error happened: ", saveResponse);

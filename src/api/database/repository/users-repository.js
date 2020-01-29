@@ -1,18 +1,18 @@
+/**
+ * Users Repository
+ */
 'use strict';
 const EsManager = require('../manager');
 const client = new EsManager().getClient();
 const INDEX_NAME = "users";
 
 
-/**
- * Users Repository
- */
 module.exports = class UsersRepository {
     constructor() {
 
     }
 
-    async existByEmail(email) {
+    async findByEmail(email) {
         try {
             const { body } = await client.search({
                 index: INDEX_NAME,
@@ -25,16 +25,24 @@ module.exports = class UsersRepository {
                 }
             });
             if (body.hits.total.value > 0) {
-                return true;
+                return body.hits.hits[0];
             }
-            return false;
         }
         catch (error) {
             if (error.name === "ResponseError" && error.message === "index_not_found_exception") {
-                return false;
+                return null;
             }
             throw error;
         }
+        return null;
+    }
+
+    async existByEmail(email) {
+        let user = await this.findByEmail(email);
+        if (user !== null) {
+            return true;
+        }
+        return false;
     }
 
     async save(username, email, password) {
@@ -48,7 +56,7 @@ module.exports = class UsersRepository {
 
                 }
             });
-            await client.indices.refresh({ index: INDEX_NAME })
+            await client.indices.refresh({ index: INDEX_NAME });
             return response;
         }
         catch (error) {
