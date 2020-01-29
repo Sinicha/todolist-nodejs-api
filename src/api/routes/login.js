@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const configJwt = require('../configuration/jwt');
 const UsersRepository = require('../database/repository/users-repository');
 const niv = require('node-input-validator');
+const Crypt = require('../security/crypt');
 
 
 const router = new Router({
@@ -33,7 +34,7 @@ module.exports = function (app) {
     const user = await usersRepository.findByEmail(email.trim().toLowerCase());
 
     // If exist, check the password and send token
-    if (user != null && password === user._source.password) { // Todo: unsafe
+    if (user != null && Crypt.compare(password, user._source.password)) {
       const payload = {
         role: 'User',
         email: email.trim().toLowerCase()

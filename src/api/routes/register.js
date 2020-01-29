@@ -5,6 +5,7 @@
 const Router = require('koa-router');
 const niv = require('node-input-validator');
 const UsersRepository = require('../database/repository/users-repository');
+const Crypt = require('../security/crypt');
 
 
 const router = new Router({
@@ -35,7 +36,8 @@ module.exports = function (app) {
         }
 
         // Save the user
-        const saveResponse = await usersRepository.save(username, email.trim().toLowerCase(), password);
+        const hashPass = Crypt.crypt(password);
+        const saveResponse = await usersRepository.save(username, email.trim().toLowerCase(), hashPass);
         if (saveResponse.statusCode != 201) {
             ctx.status = 500;
             console.error("An error happened: ", saveResponse);

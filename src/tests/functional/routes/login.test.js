@@ -3,6 +3,7 @@
  */
 const request = require('supertest');
 const UsersRepository = require('../../../api/database/repository/users-repository');
+const Crypt = require('../../../api/security/crypt');
 let app;
 
 
@@ -19,19 +20,27 @@ describe('POST /login', function () {
     };
 
     /**
-     * Start the server
+     * Start the server and create a user
      */
-    before(async () => {
+    before(function (done) {
+        this.timeout(10000); // Fix long time init es index with first user
+
         app = require('../../../server');
 
+        const hashPass = Crypt.crypt(user.password);
         let usersRepository = new UsersRepository();
-        const saveResponse = await usersRepository.save(user.username, user.email.trim().toLowerCase(), user.password);
-        if (saveResponse === null || saveResponse === undefined) {
-            console.error("Login with an known user; saveResponse::", saveResponse);
-            return;
-        }
+        usersRepository.save(user.username, user.email.trim().toLowerCase(), hashPass)
+            .then(function (res) {
+                if (res === null || res === undefined) {
+                    console.error("Login with an known user; saveResponse::", res);
+                    throw Error("Login with an known user; saveResponse");
+                }
+            })
+            .then(done, done)
+            .catch(function (error) {
+                console.log("Error, /Login test, Before(): ", error);
+            });
     });
-
 
     describe('Login with missing email', function () {
         it('Respond with status 422 Unprocessable Entity', function (done) {
