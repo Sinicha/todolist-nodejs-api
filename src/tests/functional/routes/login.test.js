@@ -4,6 +4,7 @@
 const request = require('supertest');
 const UsersRepository = require('../../../api/database/repository/users-repository');
 const Crypt = require('../../../api/security/crypt');
+const User = require('../../../api/database/models/user');
 let app;
 
 
@@ -13,7 +14,7 @@ let app;
 describe('POST /login', function () {
 
     // Create the user
-    const user = {
+    const userConf = {
         username: "User1000",
         email: "user.1000@user.new",
         password: "PassWord2020"
@@ -23,13 +24,21 @@ describe('POST /login', function () {
      * Start the server and create a user
      */
     before(function (done) {
-        this.timeout(10000); // Fix long time init es index with first user
+        // Fix long time init es index with first user
+        this.timeout(10000);
 
+        // Start server
         app = require('../../../server');
 
-        const hashPass = Crypt.crypt(user.password);
+        // Create the user model
+        const user = new User();
+        user.setUsername(userConf.username);
+        user.setEmail(userConf.email.trim().toLowerCase());
+        user.setPassword(Crypt.crypt(userConf.password));
+
+        // Save the user
         let usersRepository = new UsersRepository();
-        usersRepository.save(user.username, user.email.trim().toLowerCase(), hashPass)
+        usersRepository.save(user, true)
             .then(function (res) {
                 if (res === null || res === undefined) {
                     console.error("Login with an known user; saveResponse::", res);
@@ -92,7 +101,7 @@ describe('POST /login', function () {
             request(app)
                 .post('/login')
                 .set('Accept', 'application/json')
-                .send({ email: user.email, password: user.password })
+                .send({ email: userConf.email, password: userConf.password })
                 .set('Accept', 'application/json')
                 .expect(200)
                 .expect((res) => {
@@ -108,7 +117,7 @@ describe('POST /login', function () {
             request(app)
                 .post('/login')
                 .set('Accept', 'application/json')
-                .send({ email: user.email, password: '1234' })
+                .send({ email: userConf.email, password: '1234' })
                 .set('Accept', 'application/json')
                 .expect(401)
                 .end(done);
