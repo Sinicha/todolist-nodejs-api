@@ -75,15 +75,12 @@ describe('Check abstractRepository Class', function () {
         it('Should error if not pass', function () {
             const exceptObj = {
                 id: 1,
-                tVar: null,
                 myValue: 2
             };
 
             const Model = class model extends AbstractModel {
                 constructor() {
                     super();
-                    this.tVar = undefined;
-                    this.myValue = undefined;
                 }
             }
             Model._collectionName = "modelname";
@@ -91,11 +88,14 @@ describe('Check abstractRepository Class', function () {
             let abstractRepository = new AbstractRepository(Model);
 
             let model = new Model();
-            model.id = 1;
-            model.myValue = 2;
+            model.id = exceptObj.id;
+            model.myValue = exceptObj.myValue;
             const obj = abstractRepository.modelToObject(model);
 
-            expect(obj).to.deep.equal(exceptObj);
+            expect(obj).to.have.property('id', 1);
+            expect(obj).to.have.property('myValue', 2);
+            expect(obj).to.have.property('created_at').to.be.an('number');
+            expect(obj).to.have.property('updated_at').to.be.an('number');
         });
     });
 
@@ -117,11 +117,16 @@ describe('Check abstractRepository Class', function () {
             let abstractRepository = new AbstractRepository(Model);
 
             let model = new Model();
-            model.id = 1;
-            model.myValue = 2;
+            model.id = exceptObj.id;
+            model.myValue = exceptObj.myValue;
+            model.created_at = null;
             const obj = abstractRepository.modelToObject(model, true);
 
-            expect(obj).to.deep.equal(exceptObj);
+            expect(obj).to.have.property('id', 1);
+            expect(obj).to.have.property('myValue', 2);
+            expect(obj).to.have.property('tVar').to.be.null;
+            expect(obj).to.have.property('created_at').to.be.null;
+            expect(obj).to.have.property('updated_at').to.be.an('number');
         });
     });
 
@@ -148,25 +153,27 @@ describe('Check abstractRepository Class', function () {
             const SecondModel = class model extends AbstractModel {
                 constructor() {
                     super();
-                    this.myValue = undefined;
                 }
             }
             SecondModel._collectionName = "modeltwo";
 
             // Init sub model
-            let subModel = new FirstModel();
-            subModel.id = 2;
-            subModel.subVal = "This";
+            let subModel = new SecondModel();
+            subModel.id = exceptObj.myValue.id;
+            subModel.subVal = exceptObj.myValue.subVal;
 
             // Init root model
-            let rootModel = new SecondModel();
-            rootModel.id = 1;
+            let rootModel = new FirstModel();
+            rootModel.id = exceptObj.id;
             rootModel.myValue = subModel;
 
             let abstractRepository = new AbstractRepository(FirstModel);
             const obj = abstractRepository.modelToObject(rootModel, true);
 
-            expect(obj).to.deep.equal(exceptObj);
+            expect(obj).to.have.property('id', exceptObj.id);
+            expect(obj).to.have.nested.property('myValue').deep.equal(exceptObj.myValue);
+            expect(obj).to.have.property('created_at').to.be.null;
+            expect(obj).to.have.property('updated_at').to.be.an('number');
         });
     });
 });

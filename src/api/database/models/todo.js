@@ -9,8 +9,17 @@ class Todo extends AbstractModel {
 
     constructor() {
         super();
+        this.user = undefined;
         this.message = undefined;
         this.check = undefined;
+    }
+
+    getUser() {
+        return this.user;
+    }
+
+    setUser(value) {
+        this.user = value;
     }
 
     getMessage() {

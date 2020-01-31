@@ -28,16 +28,18 @@ module.exports = function (app) {
       password: 'required'
     });
     const { email, password } = ctx.request.body;
+    const sanEmail = email.trim().toLowerCase();
 
     // Check if the user exist
     let usersRepository = new UsersRepository();
-    const user = await usersRepository.findByEmail(email.trim().toLowerCase());
+    const user = await usersRepository.findByEmail(sanEmail);
 
     // If exist, check the password and send token
     if (user != null && Crypt.compare(password, user._source.password)) {
       const payload = {
         role: 'User',
-        email: email.trim().toLowerCase()
+        userid: user._id,
+        email: sanEmail
       };
 
       ctx.status = 200;

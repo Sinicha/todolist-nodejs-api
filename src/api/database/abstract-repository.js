@@ -4,6 +4,7 @@
 'use strict';
 const Manager = require('./manager');
 const AbstractModel = require("./abstract-model");
+const uuidv4 = require('uuid/v4');
 
 
 module.exports = class AbstractRepository extends Manager {
@@ -28,17 +29,25 @@ module.exports = class AbstractRepository extends Manager {
     /**
      * Convert a model to a document by keeping only variables
      * 
-     * @param {object} mObject - A mapped object 
+     * @param {object} mObject - An object to map and save
      * @param {boolean} refresh - Send refresh index signal to database
      * @return the database response
      */
     async save(mObject, refresh = false) {
+        const newId = uuidv4().replace(/-/g, '');
+        mObject.setId(newId);
+        
+        const rObject = this.modelToObject(mObject);
         try {
+            
             const response = await this.client.index({
                 index: this._collectionName,
-                body: mObject
+                id: newId,
+                body: rObject
             });
-            await this.client.indices.refresh({ index: this._collectionName });
+            if (refresh) {
+                await this.client.indices.refresh({ index: this._collectionName });
+            }
             return response;
         }
         catch (error) {
@@ -53,12 +62,13 @@ module.exports = class AbstractRepository extends Manager {
      * Convert a model to a document by keeping only variables
      *
      * @param {object} model - A database object class that must be map to object for save
-     * @param update, boolean that check if the object must be build for update or save
+     * @param {boolean} isUpdate, boolean that check if the object must be build for update or save
+     * @param {boolean} root, Use to know in recursive call to know if we are in root element
      * @return an object ready to save
      */
-    modelToObject(model, update = false) {
+    modelToObject(model, isUpdate = false, root = true) {
         if (model === undefined || model === null) {
-            throw new Error("(modelToObject) The given model is null. 'this._collectionName':'" + this._collectionName + "'");
+            throw new Error("(modelToObject) The given model is '" + typeof model + "'. 'this._collectionName':'" + this._collectionName + "'");
         }
 
         let obj = {};
@@ -69,7 +79,7 @@ module.exports = class AbstractRepository extends Manager {
 
             // Save subobject
             if (model[key] !== null && model[key] !== undefined && model[key] instanceof AbstractModel) {
-                value = this.modelToObject(model[key]);
+                value = this.modelToObject(model[key], isUpdate, false);
             } else {
                 value = model[key];
             }
@@ -77,15 +87,26 @@ module.exports = class AbstractRepository extends Manager {
                 key = key.substring(1);
             }
 
-            // Don't keep undefined vars when update
-            if (value !== undefined) {
+            // Don't keep undefined vars
+            if (typeof value !== 'undefined') {
                 obj[key] = value;
             } else {
-                if (!update) {
-                    obj[key] = null;
+                // Exception: don't insert date in recusrive call
+                if (!root && (key === 'created_at' || key === 'updated_at')) {
+                    continue;
                 }
+                obj[key] = null;
             }
         }
+
+        // Add created and updated date on element
+        if (root) {
+            if (!isUpdate) {
+                obj.created_at = Date.now();
+            }
+            obj.updated_at = Date.now();
+        }
+
         return obj;
     }
 }

@@ -28,7 +28,8 @@
     "koa-jwt": "^3.6.0",
     "koa-router": "^8.0.6",
     "node-input-validator": "^4.1.0",
-    "supertest": "^4.0.2"
+    "supertest": "^4.0.2",
+    "uuid": "^3.4.0"
   },
   "devDependencies": {
     "mocha": "^7.0.1",
