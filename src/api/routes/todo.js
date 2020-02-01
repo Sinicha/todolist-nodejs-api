@@ -48,29 +48,32 @@ module.exports = function (app) {
     let todosRepository = new TodosRepository();
     const saveResponse = await todosRepository.save(todo, false);
     if (saveResponse.statusCode != 201) {
-        ctx.status = 500;
-        console.error("An error happened: ", saveResponse);
-        return ctx.body = {
-            message: 'An error happened.'
-        };
+      ctx.status = 500;
+      console.error("An error happened: ", saveResponse);
+      return ctx.body = {
+        message: 'An error happened.'
+      };
     }
 
     // Send back the status
     ctx.status = ctx.status = 201;
-    return ctx.body = {
-      "message": "Todo created"
-    };
+    return ctx.body = saveResponse.datas;
   });
 
   /**
    * todo: VIEW
    */
-  router.post('/:id', jwt, (ctx, next) => {
-    // ctx.params.id;
-    ctx.status = ctx.status = 400;
-    return ctx.body = {
-      "todos": [{}]
-    };
+  router.get('/:id', jwt, async (ctx, next) => {
+    let todosRepository = new TodosRepository();
+    const findResponse = await todosRepository.findById(ctx.params.id);
+
+    if (findResponse) {
+      ctx.status = ctx.status = 200;
+      return ctx.body = findResponse.body._source;
+    } else {
+      ctx.status = ctx.status = 404;
+      return ctx.body = {};
+    }
   });
 
   /**

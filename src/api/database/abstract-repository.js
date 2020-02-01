@@ -27,6 +27,30 @@ module.exports = class AbstractRepository extends Manager {
     }
 
     /**
+     * Find an elasticsearch document by id
+     * 
+     * @param {string} id 
+     * @return the db response or null
+     */
+    async findById(id) {
+        try {
+            const response = await this.client.get({
+                index: this._collectionName,
+                id: id,
+            });
+            return response;
+        }
+        catch (error) {
+            if (error.name === "ResponseError" && error.message === "index_not_found_exception") { // Index Not Found
+                return null;
+            } else if (error.name === "ResponseError" && error.message === "Response Error") { // Document Not Found
+                return null;
+            }
+            throw error;
+        }
+    }
+
+    /**
      * Convert a model to a document by keeping only variables
      * 
      * @param {object} mObject - An object to map and save
@@ -36,10 +60,10 @@ module.exports = class AbstractRepository extends Manager {
     async save(mObject, refresh = false) {
         const newId = uuidv4().replace(/-/g, '');
         mObject.setId(newId);
-        
+
         const rObject = this.modelToObject(mObject);
         try {
-            
+
             const response = await this.client.index({
                 index: this._collectionName,
                 id: newId,
@@ -48,6 +72,7 @@ module.exports = class AbstractRepository extends Manager {
             if (refresh) {
                 await this.client.indices.refresh({ index: this._collectionName });
             }
+            response.datas = mObject;
             return response;
         }
         catch (error) {
