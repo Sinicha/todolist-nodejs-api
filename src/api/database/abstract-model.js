@@ -28,7 +28,7 @@ module.exports = class AbstractModel {
     }
 
     setUpdatedAt(updatedAt) {
-        this.updated_date = updatedAt;
+        this.updated_at = updatedAt;
     }
 
     getUpdatedAt() {

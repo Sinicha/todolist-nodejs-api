@@ -61,7 +61,7 @@ module.exports = function (app) {
   });
 
   /**
-   * todo: VIEW
+   * VIEW
    */
   router.get('/:id', jwt, async (ctx, next) => {
     let todosRepository = new TodosRepository();
@@ -77,14 +77,52 @@ module.exports = function (app) {
   });
 
   /**
-   * todo: UPDATE
+   * UPDATE
    */
-  router.put('/:id', jwt, (ctx, next) => {
-    // ctx.params.id;
-    ctx.status = ctx.status = 400;
-    return ctx.body = {
-      "todos": [{}]
-    };
+  router.put('/:id', jwt, async (ctx, next) => {
+    const todoId = ctx.params.id;
+
+    // Get user infos from jwt
+    const userId = ctx.state.user.userid; // Todo: helper get token data
+
+    // Valide infos
+    await ctx.validate({
+      message: 'maxLength:2048',
+      check: 'required|boolean'
+    });
+    const check = ctx.request.body.check;
+    const message = ctx.request.body.message || "";
+
+    // Find the document
+    let todosRepository = new TodosRepository();
+    const findResponse = await todosRepository.findById(todoId);
+    if (!findResponse) {
+      ctx.status = ctx.status = 404;
+      return ctx.body = { message: 'Document Not Found.' }
+    } else if (findResponse.body._source.user !== userId) {
+      ctx.status = ctx.status = 401;
+      return ctx.body = { message: 'Unauthorized.' }
+    }
+
+    // Create todo db model
+    const todo = new Todo();
+    todo.setId(findResponse.body._id);
+    todo.setUser(userId);
+    todo.setCheck(check);
+    todo.setMessage(message);
+    todo.setCreatedAt(findResponse.body._source.created_at);
+    todo.setUpdatedAt(findResponse.body._source.updated_at);
+
+    // Save the todo model to db
+    const updateResponse = await todosRepository.update(todo);
+
+    if (updateResponse) {
+      ctx.status = 200;
+      return ctx.body = updateResponse.datas;
+    } else {
+      ctx.status = 500;
+      return ctx.body = {};
+    }
   });
 
   /**

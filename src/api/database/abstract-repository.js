@@ -63,7 +63,6 @@ module.exports = class AbstractRepository extends Manager {
 
         const rObject = this.modelToObject(mObject);
         try {
-
             const response = await this.client.index({
                 index: this._collectionName,
                 id: newId,
@@ -73,6 +72,64 @@ module.exports = class AbstractRepository extends Manager {
                 await this.client.indices.refresh({ index: this._collectionName });
             }
             response.datas = mObject;
+            return response;
+        }
+        catch (error) {
+            if (error.name === "ResponseError" && error.message === "index_not_found_exception") {
+                return false;
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * Update a model to database
+     * 
+     * @param {object} mObject - An object to map and save
+     * @return the database response
+     */
+    async update(mObject) {
+        if (mObject === null || mObject === undefined || typeof mObject.getId() !== 'string' || mObject.getId() === '') {
+            return null;
+        }
+
+        const rObject = this.modelToObject(mObject, true);
+        try {
+            const response = await this.client.update({
+                index: this._collectionName,
+                id: mObject.getId(),
+                body: {doc: rObject}
+            });
+            response.datas = rObject;
+            return response;
+        }
+        catch (error) {
+            throw error;
+        }
+    }
+
+    /**
+     * Save a model to database
+     * 
+     * @param {object} mObject - An object to map and save
+     * @param {boolean} refresh - Send refresh index signal to database
+     * @return the database response
+     */
+    async save(mObject, refresh = false) {
+        const newId = uuidv4().replace(/-/g, '');
+        mObject.setId(newId);
+
+        const rObject = this.modelToObject(mObject);
+        try {
+            const response = await this.client.index({
+                index: this._collectionName,
+                id: newId,
+                body: rObject
+            });
+            if (refresh) {
+                await this.client.indices.refresh({ index: this._collectionName });
+            }
+            response.datas = rObject;
             return response;
         }
         catch (error) {
