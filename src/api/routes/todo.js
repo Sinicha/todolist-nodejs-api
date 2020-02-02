@@ -7,21 +7,44 @@ const jwt = require('../middlewares/jwt');
 const TodosRepository = require('../database/repository/todo-repository');
 const Todo = require('../database/models/todo');
 
+
 const router = new Router({
   prefix: '/todo'
 });
 
 module.exports = function (app) {
-  /**
-   * todo: ALL
-   */
-  router.get('/', jwt, (ctx, next) => {
-    // Get all todo elements links to the user
 
-    // Return the list of all
-    ctx.status = ctx.status = 400;
+  /**
+   * ALL
+   */
+  router.get('/', jwt, async (ctx, next) => {
+    // Get query params
+    let from = 0, size = 10;
+    if ('from' in ctx.query) {
+      const parseFrom = parseInt(ctx.query.from);
+      // Todo: fix ES 'from' limit error
+      from = (!isNaN(parseFrom) && parseFrom >= 0 && parseFrom < 9980) ? parseFrom : 0;
+    }
+
+    // Get user infos from jwt
+    const userId = ctx.state.user.userid; // Todo: helper get token data
+
+    // Find the documents
+    let todosRepository = new TodosRepository();
+    const findResponse = await todosRepository.findAllByUserId(userId, from, size);
+    const count = await todosRepository.countWithUserId(userId);
+    ctx.status = ctx.status = 200;
+    if (!findResponse) {
+      return ctx.body = {
+        "todos": [],
+        "total": count
+      };
+    }
+
+    const todos = findResponse.map(todo => todo._source);
     return ctx.body = {
-      "todos": [{}]
+      "todos": todos,
+      "total": count
     };
   });
 
