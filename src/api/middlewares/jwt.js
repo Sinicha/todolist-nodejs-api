@@ -1,5 +1,5 @@
 /**
- * Check the given token with the JWT Configuration
+ * Middleware: Check the given token is valid with the JWT Configuration
  */
 'use strict';
 const koaJwt = require('koa-jwt');

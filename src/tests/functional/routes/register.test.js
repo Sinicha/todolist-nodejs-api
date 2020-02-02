@@ -1,13 +1,22 @@
-//apiTest.js
+/**
+ * ==================== Register API test ====================
+ */
 const request = require('supertest');
-const app = require('../../../server');
+let app;
 
-//==================== register API test ====================
 
 /**
  * Testing post register endpoint
  */
 describe('POST /register', function () {
+
+    /**
+     * Start the server
+     */
+
+    before(function () {
+        app = require('../../../server');
+    });
 
     describe('Create an user with valide datas', function () {
         it('Respond with status 201 Created', function (done) {
@@ -42,6 +51,10 @@ describe('POST /register', function () {
         });
     });
 
+
+    /**
+     * Stop the server
+     */
     after(function () {
         app.close();
     });

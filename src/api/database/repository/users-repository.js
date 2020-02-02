@@ -1,21 +1,20 @@
-'use strict';
-const EsManager = require('../manager');
-const client = new EsManager().getClient();
-const INDEX_NAME = "users";
-
-
 /**
  * Users Repository
  */
-module.exports = class UsersRepository {
-    constructor() {
+'use strict';
+const AbstractRepository = require('../abstract-repository');
+const User = require('../models/user');
 
+
+module.exports = class UsersRepository extends AbstractRepository {
+    constructor() {
+        super(User);
     }
 
-    async existByEmail(email) {
+    async findByEmail(email) {
         try {
-            const { body } = await client.search({
-                index: INDEX_NAME,
+            const { body } = await this.client.search({
+                index: this._collectionName,
                 body: {
                     query: {
                         match: {
@@ -25,37 +24,23 @@ module.exports = class UsersRepository {
                 }
             });
             if (body.hits.total.value > 0) {
-                return true;
+                return body.hits.hits[0];
             }
-            return false;
         }
         catch (error) {
             if (error.name === "ResponseError" && error.message === "index_not_found_exception") {
-                return false;
+                return null;
             }
             throw error;
         }
+        return null;
     }
 
-    async save(username, email, password) {
-        try {
-            const response = await client.index({
-                index: INDEX_NAME,
-                body: {
-                    username: username,
-                    email: email,
-                    password: password
-
-                }
-            });
-            await client.indices.refresh({ index: INDEX_NAME })
-            return response;
+    async existByEmail(email) {
+        let user = await this.findByEmail(email);
+        if (user !== null) {
+            return true;
         }
-        catch (error) {
-            if (error.name === "ResponseError" && error.message === "index_not_found_exception") {
-                return false;
-            }
-            throw error;
-        }
+        return false;
     }
 }

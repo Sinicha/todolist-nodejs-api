@@ -2,7 +2,7 @@
 const { Client } = require('@elastic/elasticsearch')
 const configDb = require('../configuration/database');
 
-// The manager is global in this file
+// The client instance is global
 let gClient;
 
 

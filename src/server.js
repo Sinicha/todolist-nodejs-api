@@ -7,6 +7,7 @@
 'use strict';
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
+const routes = require('./api/routes');
 
 // Configurations
 const port = process.env.PORT || 8000;
@@ -18,11 +19,8 @@ app.use(bodyParser({
     }
 }));
 
-// Register routes
-const authRoutes = require('./api/routes/authRoute');
-const registerRoutes = require('./api/routes/register');
-authRoutes(app);
-registerRoutes(app);
+// Register the api routes
+routes(app);
 
 // Run the Koa server
 let server = app.listen(port);
