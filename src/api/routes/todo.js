@@ -126,14 +126,34 @@ module.exports = function (app) {
   });
 
   /**
-   * todo: DELETE
+   * DELETE
    */
-  router.delete('/:id', jwt, (ctx, next) => {
-    // ctx.params.id;
-    ctx.status = ctx.status = 400;
-    return ctx.body = {
-      "todos": [{}]
-    };
+  router.delete('/:id', jwt, async (ctx, next) => {
+    const todoId = ctx.params.id;
+
+    // Get user infos from jwt
+    const userId = ctx.state.user.userid; // Todo: helper get token data
+
+    // Find the document
+    let todosRepository = new TodosRepository();
+    const findResponse = await todosRepository.findById(todoId);
+    if (!findResponse) {
+      ctx.status = ctx.status = 404;
+      return ctx.body = { message: 'Document Not Found.' };
+    } else if (findResponse.body._source.user !== userId) {
+      ctx.status = ctx.status = 401;
+      return ctx.body = { message: 'Unauthorized.' }
+    }
+
+    // Delete the todo model to db
+    const deleteResponse = await todosRepository.delete(todoId);
+
+    if (deleteResponse) {
+      return ctx.status = 204;
+    } else {
+      ctx.status = 404;
+      return ctx.body = { message: 'Document Not Found.' };
+    }
   });
 
   app.use(router.routes());

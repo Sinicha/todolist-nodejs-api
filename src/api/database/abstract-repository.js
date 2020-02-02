@@ -98,7 +98,7 @@ module.exports = class AbstractRepository extends Manager {
             const response = await this.client.update({
                 index: this._collectionName,
                 id: mObject.getId(),
-                body: {doc: rObject}
+                body: { doc: rObject }
             });
             response.datas = rObject;
             return response;
@@ -135,6 +135,32 @@ module.exports = class AbstractRepository extends Manager {
         catch (error) {
             if (error.name === "ResponseError" && error.message === "index_not_found_exception") {
                 return false;
+            }
+            throw error;
+        }
+    }
+
+    /**
+     * Delete an element in database with id
+     * 
+     * @param {string} id - An object id to delete
+     * @return the database response
+     */
+    async delete(id) {
+        try {
+            const response = await this.client.delete({
+                index: this._collectionName,
+                id: id
+            });
+            return response;
+        }
+        catch (error) {
+            // Not Found
+            if (error.meta.statusCode === 404) {
+                return null;
+            }
+            if (error.name === "ResponseError" && error.message === "index_not_found_exception") {
+                return null;
             }
             throw error;
         }

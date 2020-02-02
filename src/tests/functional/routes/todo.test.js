@@ -143,7 +143,6 @@ describe('Route /todo/**', function () {
         describe('Update a todo element of an other user', function () {
             it('Respond with status 401 Unauthorized', function (done) {
                 // 1. Generate first fake token
-                // Generate fake token
                 const payload = {
                     role: 'User',
                     userid: '9876543210',
@@ -240,6 +239,78 @@ describe('Route /todo/**', function () {
     });
 
 
+    describe('DELETE /todo/{id}', function () {
+
+        describe("Delete a todo element that don't exist", function () {
+            it('Respond with status 404 NOT FOUND', function (done) {
+                const id = "001122334455667788"
+                request(app)
+                    .delete('/todo/' + id)
+                    .set('Accept', 'application/json')
+                    .set('Authorization', token)
+                    .send()
+                    .expect(404)
+                    .end(done);
+            });
+        });
+
+        describe('Delete a todo element of an other user', function () {
+            it('Respond with status 401 Unauthorized', function (done) {
+                // 1. Generate first fake token
+                const payload = {
+                    role: 'User',
+                    userid: '9876543210',
+                    email: 'user.number.one@user.exi'
+                };
+                let tokenFirst = 'Bearer ' + jwt.sign(payload, configJwt.SECRET, { algorithm: configJwt.ALGORITHM, expiresIn: configJwt.EXPIRES_IN });
+
+                // 2. Create a new todo element with the first token and get the id
+                request(app)
+                    .post('/todo')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', tokenFirst)
+                    .send({ message: "Here's Johnny!" })
+                    .then((response) => {
+                        const { id } = response.body;
+
+                        // 3. Delete the new element with the other user's token
+                        request(app)
+                            .delete('/todo/' + id)
+                            .set('Accept', 'application/json')
+                            .set('Authorization', token)
+                            .send()
+                            .expect(401)
+                            .end(done);
+                    });
+            });
+        });
+
+        describe("Delete a todo element that exist", function () {
+            it('Respond with status 204 NO CONTENT', function (done) {
+                // 1. Create a new todo element and get the id
+                request(app)
+                    .post('/todo')
+                    .set('Accept', 'application/json')
+                    .set('Authorization', token)
+                    .send({ message: "I'll be back." })
+                    .then((response) => {
+                        const { id } = response.body;
+
+                        // 2. Delete the new element
+                        request(app)
+                            .delete('/todo/' + id)
+                            .set('Accept', 'application/json')
+                            .set('Authorization', token)
+                            .send()
+                            .expect(204)
+                            .end(done);
+                    });
+            });
+        });
+
+    });
+
+
     /**
      * Stop the server
      */
@@ -247,4 +318,3 @@ describe('Route /todo/**', function () {
         app.close();
     });
 });
-
